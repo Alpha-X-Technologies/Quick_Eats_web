@@ -1,12 +1,15 @@
 import React from 'react';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { Router, Switch, Route, Link } from "react-router-dom";
 
-import { Provider } from 'react-redux';
-import store from './_components/Store'
-import { history } from '../_helpers';
+import { history } from './_helpers';
 import { HomePage } from './HomePage';
+
+import {alertActions} from './_actions'
+import {connect} from 'react-redux'
+import { PrivateRoute } from './_components';
+
 
 import Login from "./LoginPage/Login";
 import SignUp from "./RegisterPage/SignUp";
@@ -16,15 +19,15 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
-    history.listen((location, action) => {
-      // clear alert on location change
-      this.props.clearAlerts();
-    });
+    const { dispatch } = this.props;
+        history.listen((location, action) => {
+            // clear alert on location change
+            dispatch(alertActions.clear());
+        });
   }
   render() {
     return (
-      <Provider store={store}>
-        <Router>
+      <Router history={history}>
           <div className="App">
             <nav className="navbar navbar-expand-lg navbar-light fixed-top">
               <div className="container">
@@ -41,29 +44,27 @@ class App extends React.Component {
                 </div>
               </div>
             </nav>
-
+            <Switch>
+            <PrivateRoute exact path="/" component={HomePage} />
             <div className="auth-wrapper">
               <div className="auth-inner">
-                <Switch>
-                  <Route exact path='/' component={HomePage} />
                   <Route path="/sign-in" component={Login} />
                   <Route path="/sign-up" component={SignUp} />
-                </Switch>
               </div>
             </div>
-          </div></Router>
-      </Provider>
+            </Switch>
+          </div>
+          </Router>
     );
+
   }
 }
-function mapState(state) {
+function mapStateToProps(state) {
   const { alert } = state;
-  return { alert };
+  return {
+      alert
+  };
 }
 
-const actionCreators = {
-  clearAlerts: alertActions.clear
-};
-
-const connectedApp = connect(mapState, actionCreators)(App);
-export { connectedApp as App };
+const connectedApp = connect(mapStateToProps)(App);
+export { connectedApp as App }; 

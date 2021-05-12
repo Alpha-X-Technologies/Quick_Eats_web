@@ -11,11 +11,11 @@ export const userActions = {
     delete: _delete
 };
 
-function login(username, password) {
+function login(email, password) {
     return dispatch => {
-        dispatch(request({ username }));
+        dispatch(request({ email }));
 
-        userService.login(username, password)
+        userService.login(email, password)
             .then(
                 user => { 
                     dispatch(success(user));
@@ -63,8 +63,8 @@ function register(user) {
 
 function getAll() {
     return dispatch => {
+        console.log('LOGGING GET ALL REQUEST')
         dispatch(request());
-
         userService.getAll()
             .then(
                 users => dispatch(success(users)),

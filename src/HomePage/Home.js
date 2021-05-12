@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component, useState } from 'react';
 import { BrowserRouter as Router, Link } from "react-router-dom";
 import { connect } from 'react-redux';
 
@@ -13,17 +13,22 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import '../App.css';
 import { Row, Col } from 'reactstrap';
 
-class HomePage extends React.Component {
-  componentDidMount() {
-    this.props.getUsers();
-  }
+export class HomePage extends Component {
 
-  handleDeleteUser(id) {
-    return (e) => this.props.deleteUser(id);
+  state = {
+    user: null
   }
+  // componentDidMount() {
+  //   const user = localStorage.getItem('user');
+  //   console.log('LocalStorage', user)
+  //   this.state.user = user
+  // }
+
 
   render() {
-    const { user, users } = this.props;
+    const user = localStorage.getItem('user');
+    this.state.user = user
+    const userJson = JSON.parse(user)
     return (
       <React.Fragment>
         <NavigationBar />
@@ -37,25 +42,10 @@ class HomePage extends React.Component {
           <Col xs="9">
 
             <div className="col-md-6 col-md-offset-3">
-              <h1>Hi {user.firstName}!</h1>
+              <h1>Hi {userJson.user.name}!</h1>
               <p>You're logged in with React!!</p>
-              <h3>All registered users:</h3>
-              {users.loading && <em>Loading users...</em>}
-              {users.error && <span className="text-danger">ERROR: {users.error}</span>}
-              {users.items &&
-                <ul>
-                  {users.items.map((user, index) =>
-                    <li key={user.id}>
-                      {user.firstName + ' ' + user.lastName}
-                      {
-                        user.deleting ? <em> - Deleting...</em>
-                          : user.deleteError ? <span className="text-danger"> - ERROR: {user.deleteError}</span>
-                            : <span> - <a onClick={this.handleDeleteUser(user.id)}>Delete</a></span>
-                      }
-                    </li>
-                  )}
-                </ul>
-              }
+              <h3>Dashboard</h3>
+
               <p>
                 <Link to="/login">Logout</Link>
               </p>
@@ -68,16 +58,19 @@ class HomePage extends React.Component {
   }
 }
 
-function mapState(state) {
+function mapStateToProps(state) {
   const { users, authentication } = state;
   const { user } = authentication;
-  return { user, users };
+  return {
+    user,
+    users
+  };
 }
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getAll: () => dispatch(userActions.getAll())
 
-const actionCreators = {
-  getUsers: userActions.getAll,
-  deleteUser: userActions.delete
+  };
 }
-
-const connectedHomePage = connect(mapState, actionCreators)(HomePage);
-export { connectedHomePage as HomePage };
+const connectedHomePage = connect(mapStateToProps, mapDispatchToProps)(HomePage);
+export default connectedHomePage;

@@ -1,7 +1,12 @@
-import {combineReducers} from 'redux';
-import itemReducer from './itemReducer';
+import { combineReducers } from 'redux';
+import { authentication } from './authenticationReducer';
+import { users } from './userReducer';
+import { alert } from './alertReducer';
 
-export default combineReducers({
-    item: itemReducer,
-    
+const rootReducer = combineReducers({
+  authentication,
+  users,
+  alert
 });
+
+export default rootReducer;
